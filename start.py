@@ -1,4 +1,5 @@
-from File import File
+from file import File
+from shortest_path import ShortestPath
 
 class Start:
     def __init__(self):
@@ -26,6 +27,8 @@ class Start:
                 else:                
                     print(f"({edge[0]}) ----- {edge[2]} ----> ({edge[1]})")
 
+            print(f"\nShortest path ({s}) ----> ({k})")
+            shortest_path = ShortestPath(v, e, s, k, edges)
         except FileNotFoundError:
             print("[ERROR] File not found. Please check the file name and try again.")
             self.run()
