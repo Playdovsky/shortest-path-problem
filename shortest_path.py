@@ -36,4 +36,8 @@ class ShortestPath:
                     new_path = current_path + [edge[1]]
                     heapq.heappush(self.pq, (new_weight, new_path))
         
+        if final_edges_sum == 0:
+            print(f"No path found from ({self.start_vertex}) to ({self.end_vertex})")
+            return
+        
         print(f"for the shortest path algorithm travels through {final_edges_sum} edges\nwith total sum of {final_weights_sum} weights\n({') --> ('.join(final_path)})")
