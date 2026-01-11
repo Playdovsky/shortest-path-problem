@@ -9,37 +9,61 @@ class ShortestPath:
         self.end_vertex = end_vertex
         self.graph_edges = edges
         
-        self.find_path(edges)
+        self.find_path()
 
-    def find_path(self, edges):
+    def find_path(self):
         self.final_weights_sum = 0
         self.final_edges_sum = 0
         self.final_path = None
         self.pq = []
 
-        for edge in edges:
-            if edge[0] == self.start_vertex:
-                heapq.heappush(self.pq, (int(edge[2]), [edge[0], edge[1]]))
-        
+        adjacents = {}
+
+        for start_vertex, end_vertex, weight in self.graph_edges:
+            if start_vertex not in adjacents:
+                adjacents[start_vertex] = []
+
+            adjacents[start_vertex].append((end_vertex, int(weight)))
+
+        heapq.heappush(self.pq, (0, self.start_vertex))
+
+        best = {self.start_vertex: 0}
+
+        previous = {}
+
         while self.pq:
-            current_weight, current_path = heapq.heappop(self.pq)
-            current_vertex = current_path[-1]
+            current_weight, current_vertex = heapq.heappop(self.pq)
+
+            if current_weight > best.get(current_vertex, float('inf')):
+                continue
 
             if current_vertex == self.end_vertex:
                 self.final_weights_sum = current_weight
-                self.final_path = current_path
-                self.final_edges_sum = len(current_path) - 1
                 break
 
-            for edge in self.graph_edges:
-                if edge[0] == current_vertex and edge[1] not in current_path:
-                    new_weight = current_weight + int(edge[2])
-                    new_path = current_path + [edge[1]]
-                    heapq.heappush(self.pq, (new_weight, new_path))
-        
-        if not self.final_path:
+            for adjacent, adj_weight in adjacents.get(current_vertex, []):
+                new_weight = current_weight + adj_weight
+
+                if new_weight < best.get(adjacent, float('inf')):
+                    best[adjacent] = new_weight
+                    previous[adjacent] = current_vertex
+                    heapq.heappush(self.pq, (new_weight, adjacent))
+
+        if self.end_vertex not in best:
             print(f"No path found from ({self.start_vertex}) to ({self.end_vertex})")
             return
+
+        path = []
+        visited_vertex = self.end_vertex
+        while visited_vertex != self.start_vertex:
+            path.append(visited_vertex)
+            visited_vertex = previous[visited_vertex]
+
+        path.append(self.start_vertex)
+        path.reverse()
+
+        self.final_path = path
+        self.final_edges_sum = len(path) - 1
         
         print(f"for the shortest path algorithm travels through {self.final_edges_sum} edges\nwith total sum of {self.final_weights_sum} weights\n({') --> ('.join(self.final_path)})")
         visualize = Visualize(self.vertices, self.graph_edges, self.final_path)
